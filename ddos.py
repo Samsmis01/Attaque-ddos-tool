@@ -4,6 +4,7 @@ import random
 import time
 import socket
 import threading
+from tests import ddos_attack_with_proxies
 from tests import (
     detect_vulnerability,
     get_cookies,
