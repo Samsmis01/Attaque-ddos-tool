@@ -1,3 +1,4 @@
+from .tests import xss_attack, csrf_attack, fuzzing_attack  # Import des fonctions csrf_attack et fuzzing_attack depuis le module tests
 import requests
 from termcolor import colored
 import random
