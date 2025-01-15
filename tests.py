@@ -95,7 +95,6 @@ def advanced_sql_injection_test(url):
         if "Welcome" in response.text:
             print(f"[+] Injection réussie avec le payload: {payload}")
 
-# Fonction pour l'attaque XSS (Cross-Site Scripting)
 def xss_attack(url):
     print(colored("[*] Lancement de l'attaque XSS (Cross-Site Scripting)...", "yellow"))
     payloads = [
