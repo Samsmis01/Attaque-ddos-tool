@@ -8,7 +8,7 @@ from tests import (
     detect_vulnerability,
     get_cookies,
     lfi_test,
-    ddos_attack,
+    ddos_attack_with_proxies,
     bruteforce_attack_with_proxies,
     advanced_sql_injection_test,
     xss_attack,
@@ -129,7 +129,7 @@ def run_tests(url):
 
     # Lancement de l'attaque DDoS
     try:
-        ddos_thread = threading.Thread(target=ddos_attack, args=(url,))
+        ddos_thread = threading.Thread(target=ddos_attack_with_proxies, args=(url,))
         ddos_thread.start()
         ddos_thread.join()
     except Exception as e:
