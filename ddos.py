@@ -4,7 +4,7 @@ import random
 import time
 import socket
 import threading
-from tests import detect_vulnerability, get_cookies, lfi_test, ddos_attack, bruteforce_attack_with_proxies, advanced_sql_injection_test,csrf_attack, fuzzing_attack
+from tests import detect_vulnerability, get_cookies, lfi_test, ddos_attack, bruteforce_attack_with_proxies, advanced_sql_injection_test,xss_attack,fuzzing_attack
 
 # Liste de proxies à utiliser
 PROXY_LIST = ['http://proxy1', 'http://proxy2', 'http://proxy3']
